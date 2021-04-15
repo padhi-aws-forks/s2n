@@ -23,7 +23,7 @@ void s2n_array_capacity_harness()
     /* Non-deterministic inputs. */
     struct s2n_array *array = cbmc_allocate_s2n_array();
     __CPROVER_assume(s2n_result_is_ok(s2n_array_validate(array)));
-    __CPROVER_assume(s2n_array_is_bounded(array, MAX_ARRAY_LEN, MAX_ARRAY_ELEMENT_SIZE));
+    //__CPROVER_assume(s2n_array_is_bounded(array, MAX_ARRAY_LEN, MAX_ARRAY_ELEMENT_SIZE));
     uint32_t* capacity = malloc(sizeof(*capacity));
 
     /* Operation under verification. */
