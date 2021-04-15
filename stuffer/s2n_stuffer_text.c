@@ -45,7 +45,12 @@ int s2n_stuffer_skip_whitespace(struct s2n_stuffer *s2n_stuffer, uint32_t *skipp
 {
     POSIX_PRECONDITION(s2n_stuffer_validate(s2n_stuffer));
     uint32_t initial_read_cursor = s2n_stuffer->read_cursor;
-    while (s2n_stuffer->read_cursor < s2n_stuffer->write_cursor) {
+    while (s2n_stuffer->read_cursor < s2n_stuffer->write_cursor)
+      __CPROVER_loop_invariant(
+          s2n_stuffer->read_cursor <= s2n_stuffer->write_cursor &&
+          s2n_stuffer->read_cursor >= initial_read_cursor
+      )
+    {
         switch (s2n_stuffer->blob.data[s2n_stuffer->read_cursor]) {
         case ' ':              /* We don't use isspace, because it changes under locales */
         case '\t':
@@ -111,7 +116,11 @@ int s2n_stuffer_skip_read_until(struct s2n_stuffer *stuffer, const char *target)
 int s2n_stuffer_skip_to_char(struct s2n_stuffer *stuffer, const char target)
 {
     POSIX_PRECONDITION(s2n_stuffer_validate(stuffer));
-    while (s2n_stuffer_data_available(stuffer) > 0) {
+    while (s2n_stuffer_data_available(stuffer) > 0)
+    __CPROVER_loop_invariant(
+        stuffer->write_cursor >= stuffer->read_cursor
+    )
+    {
         if (stuffer->blob.data[stuffer->read_cursor] == target) {
             break;
         }
@@ -128,7 +137,12 @@ int s2n_stuffer_skip_expected_char(struct s2n_stuffer *stuffer, const char expec
     POSIX_ENSURE(min <= max, S2N_ERR_SAFETY);
 
     uint32_t skip = 0;
-    while (stuffer->read_cursor < stuffer->write_cursor && skip < max) {
+    while (stuffer->read_cursor < stuffer->write_cursor && skip < max)
+    __CPROVER_loop_invariant(
+        stuffer->read_cursor <= stuffer->write_cursor &&
+        skip <= max
+    )
+    {
         if (stuffer->blob.data[stuffer->read_cursor] == expected){
             stuffer->read_cursor += 1;
             skip += 1;

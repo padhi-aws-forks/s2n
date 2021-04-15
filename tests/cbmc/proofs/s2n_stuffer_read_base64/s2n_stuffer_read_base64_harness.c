@@ -25,30 +25,30 @@ void s2n_stuffer_read_base64_harness()
 {
     struct s2n_stuffer *stuffer = cbmc_allocate_s2n_stuffer();
     __CPROVER_assume(s2n_result_is_ok(s2n_stuffer_validate(stuffer)));
-    __CPROVER_assume(s2n_blob_is_bounded(&stuffer->blob, MAX_BLOB_SIZE));
+    //__CPROVER_assume(s2n_blob_is_bounded(&stuffer->blob, MAX_BLOB_SIZE));
 
     struct s2n_stuffer *out = cbmc_allocate_s2n_stuffer();
     __CPROVER_assume(s2n_result_is_ok(s2n_stuffer_validate(out)));
 
     /* Save previous state from stuffer. */
-    struct s2n_stuffer            old_stuffer = *stuffer;
-    struct store_byte_from_buffer old_byte_from_stuffer;
-    save_byte_from_blob(&stuffer->blob, &old_byte_from_stuffer);
+    // struct s2n_stuffer            old_stuffer = *stuffer;
+    // struct store_byte_from_buffer old_byte_from_stuffer;
+    // save_byte_from_blob(&stuffer->blob, &old_byte_from_stuffer);
 
     /* Save previous state from out. */
-    struct s2n_stuffer old_out = *out;
+    //struct s2n_stuffer old_out = *out;
 
     nondet_s2n_mem_init();
 
     if (s2n_stuffer_read_base64(stuffer, out) == S2N_SUCCESS) {
         assert(s2n_result_is_ok(s2n_stuffer_validate(out)));
-        if (s2n_stuffer_data_available(&old_stuffer) >= 4) {
-            size_t idx;
-            __CPROVER_assume(idx >= old_stuffer.read_cursor && idx < old_stuffer.write_cursor);
-            assert(s2n_is_base64_char(stuffer->blob.data[ idx ]));
-        }
+        // if (s2n_stuffer_data_available(&old_stuffer) >= 4) {
+        //     size_t idx;
+        //     __CPROVER_assume(idx >= old_stuffer.read_cursor && idx < old_stuffer.write_cursor);
+        //     assert(s2n_is_base64_char(stuffer->blob.data[ idx ]));
+        // }
     }
 
-    assert_stuffer_immutable_fields_after_read(stuffer, &old_stuffer, &old_byte_from_stuffer);
+    //assert_stuffer_immutable_fields_after_read(stuffer, &old_stuffer, &old_byte_from_stuffer);
     assert(s2n_result_is_ok(s2n_stuffer_validate(stuffer)));
 }

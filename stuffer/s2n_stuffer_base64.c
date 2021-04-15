@@ -140,7 +140,13 @@ int s2n_stuffer_read_base64(struct s2n_stuffer *stuffer, struct s2n_stuffer *out
             ptr++;
             *ptr = ((value3 << 6) & 0xc0) | (value4 & 0x3f);
         }
-    } while (bytes_this_round == 3);
+    } while (bytes_this_round == 3)
+    __CPROVER_loop_invariant(
+        stuffer->read_cursor <= stuffer->write_cursor &&
+        0 <= bytes_this_round &&
+        bytes_this_round <= 3
+        /* WIP */
+    );
 
     return S2N_SUCCESS;
 }
